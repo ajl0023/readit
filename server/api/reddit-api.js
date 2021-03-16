@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
+const Post = require("../models/Post");
+const User = require("../models/User");
 const Comment = require("../models/Comment");
 const AWS = require("aws-sdk");
 const multer = require("multer");
