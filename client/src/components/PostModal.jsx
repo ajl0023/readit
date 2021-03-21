@@ -1,18 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 import { newComment } from "../actions/commentActions";
-import {
-  changePoint,
-  editPost,
-  fetchSinglePost,
-  splicePost,
-} from "../actions/postActions";
+import { changePoint, editPost } from "../actions/postActions";
 import downvote from "../images/down-arrow.svg";
 import { ReactComponent as Edit } from "../images/edit.svg";
 import upvote from "../images/up-arrow.svg";
 import Comment from "./Comment";
-
 const PostModal = (props) => {
   const params = useParams();
   const dispatch = useDispatch();
@@ -20,40 +14,20 @@ const PostModal = (props) => {
   const [commentText, setCommentText] = useState("");
   const [edit, setEdit] = useState(false);
   const [editText, setEditText] = useState("");
-
   const currentUser = useSelector((state) => state.currentUser._id);
-  const allIds = useSelector((state) => {
-    return state.posts.allIds;
-  });
   const comments = useSelector((state) => {
-    return {
-      test: state.comments.byId,
-    };
+    return state.comments.byId;
   });
-
   const loggedIn = useSelector((state) => state.login.isLoggedIn);
-
   let currentPost = props.post;
-  const sortOrder = useSelector((state) => {
-    return state.listings.sortOrder;
-  });
   const back = (e) => {
     e.stopPropagation();
   };
   const handleReroute = () => {
-    if (currentPost.newPost) {
-      dispatch(splicePost(params.id));
-    }
-    if (currentPost.newPost || sortOrder === "default") {
-      history.push("/");
-    } else {
-      history.goBack();
-
-      document.body.style.overflow = "";
-    }
+    history.push("/");
   };
   const handleSubmitComment = () => {
-    dispatch(newComment(commentText, params.id));
+    dispatch(newComment(commentText, props.post._id));
     setCommentText("");
   };
   const handleUpvote = () => {
@@ -73,7 +47,6 @@ const PostModal = (props) => {
   const handleEdit = () => {
     setEdit(true);
   };
-
   const handleCancelEdit = () => {
     setEdit(false);
   };
@@ -81,20 +54,19 @@ const PostModal = (props) => {
     dispatch(editPost(id, editText));
     setEdit(false);
   };
-  useEffect(() => {
-    if (!allIds.includes(params.id)) {
-      dispatch(fetchSinglePost(params.id));
-    }
-  }, []);
-
   if (!currentPost) {
     return <div></div>;
   }
   const date = new Date(currentPost.createdAt);
   const formatDate = new Intl.DateTimeFormat("en-US", {}).format(date);
-
   return (
     <div onClick={handleReroute} className="modal-wrapper">
+      <input type="checkbox" id="trigger" className={"burger-input"} />
+      <label htmlFor="trigger" className={"close-label"}>
+        <div onClick={handleReroute} className={"main-close-icon-container"}>
+          <span className={"main-close-icon"}></span>
+        </div>
+      </label>
       <div onClick={back} className="card-modal">
         {currentPost.author ? (
           <>
@@ -111,7 +83,6 @@ const PostModal = (props) => {
                 >
                   {currentPost.content}
                 </p>
-
                 <textarea
                   onChange={(e) => {
                     setEditText(e.target.value);
@@ -141,7 +112,9 @@ const PostModal = (props) => {
                 </button>
               </div>
             ) : null}
-            <img className="post-image" src={props.post.image} alt="" />
+            <div className="post-image-container">
+              <img className="post-image" src={props.post.image} alt="" />
+            </div>
             {currentUser ? (
               <div className="new-comment-container">
                 <textarea
@@ -171,7 +144,6 @@ const PostModal = (props) => {
                 </p>
                 <div className="auth-button-container">
                   <button onClick={props.handleShowLogin}>log in</button>
-
                   <button onClick={props.handleShowSignup}>sign up</button>
                 </div>
               </div>
@@ -189,7 +161,6 @@ const PostModal = (props) => {
                 />
               </li>
               <li>{currentPost.voteTotal}</li>
-
               <li onClick={handleDownVote}>
                 <img
                   className={
@@ -203,22 +174,22 @@ const PostModal = (props) => {
               </li>
             </div>
             <h4 className="comment-section-header">Comments</h4>
-            {props.post.comments.map((a) => {
-              return (
-                <Comment
-                  handleShowLogin={props.handleShowLogin}
-                  key={a}
-                  comment={comments.test[a]}
-                />
-              );
-            })}
+            {props.post.comments.length > 0 &&
+              props.post.comments.map((comment) => {
+                return (
+                  <Comment
+                    handleShowLogin={props.handleShowLogin}
+                    key={comment}
+                    comment={comments[comment]}
+                  />
+                );
+              })}
           </>
         ) : null}
       </div>
     </div>
   );
 };
-
 function mapStateToProps(state, ownProps) {
   let id = ownProps.match.params.id;
   let post;

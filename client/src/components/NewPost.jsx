@@ -1,16 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Link, Route, useLocation, Switch, useHistory } from "react-router-dom";
-import {
-  changePostSubmissionType,
-  newPostSubmissionType,
-  submitPost,
-  submitPostAttempt,
-} from "../actions/postActions";
-import { useSelector, useDispatch, connect } from "react-redux";
-import Axios from "axios";
-import { SET_POST_MODAL } from "../types";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useLocation } from "react-router-dom";
+import { changePostSubmissionType, submitPost } from "../actions/postActions";
 
-const NewPost = (props) => {
+const NewPost = () => {
   const useQuery = () => {
     return new URLSearchParams(useLocation().search);
   };
@@ -22,7 +15,6 @@ const NewPost = (props) => {
   });
   const history = useHistory();
   const dispatch = useDispatch();
-  const [currentType, setCurrentType] = useState("");
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [imagedata, setImage] = useState("");
@@ -54,7 +46,6 @@ const NewPost = (props) => {
     dispatch(submitPost(data));
   };
 
-  const mediaType = () => {};
   const handleFormType = () => {
     window.history.replaceState("page2", "Title", "/new-post");
 

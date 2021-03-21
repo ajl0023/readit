@@ -1,21 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  newReplyRequest,
-  newReply,
-  newComment,
-  changeCommentPoint,
-} from "../actions/commentActions";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import upvote from "../images/up-arrow.svg";
+import {
+  changeCommentPoint,
+  newReply,
+  newReplyRequest,
+} from "../actions/commentActions";
 import downvote from "../images/down-arrow.svg";
+import upvote from "../images/up-arrow.svg";
 const Comment = ({ comment, handleShowLogin }) => {
   const allComments = useSelector((state) => {
     return state.comments.byId;
-  });
-  const arrayOfId = useSelector((state) => {
-    return state.comments.allId;
   });
   const loggedIn = useSelector((state) => state.login.isLoggedIn);
 
@@ -23,8 +18,6 @@ const Comment = ({ comment, handleShowLogin }) => {
   const params = useParams();
   const [replyText, setReplyText] = useState("");
   const [replyToggle, setReplyToggle] = useState(false);
-  const [voteTotal, setVoteTotal] = useState(null);
-  const [comments, setComments] = useState();
   const voteUp = () => {
     if (loggedIn) {
       dispatch(changeCommentPoint(1, params.id, comment._id));
@@ -45,25 +38,19 @@ const Comment = ({ comment, handleShowLogin }) => {
   };
 
   const handleReply = () => {
-    let postId = comment.postId;
     let commentId = comment._id;
     dispatch(newReply(replyText, params.id, commentId));
     setReplyToggle(false);
     setReplyText("");
   };
-  const handleUpvote = () => {
-    let data = comment;
-  };
+
   useEffect(() => {}, []);
   if (!comment) {
     return <div></div>;
   }
   const nestedComments = (comment.comments || []).map((comment) => {
-    return (
-      <Comment key={comment._id} comment={allComments[comment]} type="child" />
-    );
+    return <Comment key={comment} comment={allComments[comment]} />;
   });
-
   return (
     <div style={{ marginLeft: "15px", marginTop: "10px" }}>
       <div className="comment-vote-title-container">

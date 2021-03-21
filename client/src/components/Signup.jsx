@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { signup, signupRequest } from "../actions/userActions";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CLEAR_ERROR, SIGNUP_REQUEST } from "../types";
 import { Redirect } from "react-router-dom";
+import { signup, signupRequest } from "../actions/userActions";
+import { CLEAR_ERROR } from "../types";
 import Login from "./Login";
 const Signup = (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [editActive, setEditActive] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => {
     return state.login.isLoggedIn;
@@ -34,10 +33,10 @@ const Signup = (props) => {
   }
   useEffect(() => {
     dispatch(signupRequest());
-  }, []);
+  }, [dispatch]);
   return (
-    <div className="modal-wrapper">
-      <div className="card-modal">
+    <div className="login-modal-wrapper">
+      <div className="login-card-modal">
         <div className="login-modal-title-exit-container">
           <p className="login-modal-title">Sign up</p>
           <button onClick={props.close} className="login-cancel-button">
@@ -72,7 +71,6 @@ const Signup = (props) => {
             placeholder="Confirm your password"
             type="password"
           />
-
           <button onClick={handleSignup} className="login-button">
             Sign up
           </button>
@@ -81,5 +79,4 @@ const Signup = (props) => {
     </div>
   );
 };
-
 export default Signup;

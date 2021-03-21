@@ -6,6 +6,7 @@ var CommentSchema = new Schema({
   createdAt: { type: Date },
   updatedAt: { type: Date },
   comments: [this],
+
   author: { type: Schema.Types.ObjectId, ref: "user", required: true },
   authorName: { type: String, required: false },
   postId: { type: Schema.Types.ObjectId, ref: "post", required: true },
@@ -16,8 +17,6 @@ var CommentSchema = new Schema({
     type: String,
   },
 });
-CommentSchema.statics.voteState = function (userId) {
-  Comment.find({ upVotes: [] }, (comment) => {});
-};
+
 const Comment = mongoose.model("comment", CommentSchema);
 module.exports = Comment;

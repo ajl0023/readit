@@ -1,18 +1,17 @@
 import axios from "axios";
 import {
+  CLEAR_LOGIN_MODAL,
   CURRENT_USER,
-  LOGIN_ERROR,
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOG_OUT,
-  REFRESH_USER,
+  REQUEST_USER_INFO,
   SIGNUP_ERROR,
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,
   UNAUTHORIZED_ERROR,
-  CLEAR_LOGIN_MODAL,
 } from "../types";
-
+let retryCount = 0;
 axios.interceptors.request.use((config) => {
   const accessToken = localStorage.getItem("accessToken");
   if (accessToken) {
@@ -20,21 +19,42 @@ axios.interceptors.request.use((config) => {
   }
   return config;
 });
-
+axios.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  function (err) {
+    const originalRequest = err.config;
+    if (
+      (err.response.status === 401 || err.response.status === 403) &&
+      !originalRequest._retry &&
+      retryCount <= 2 &&
+      err.config.url !== "/api/refresh"
+    ) {
+      retryCount = retryCount + 1;
+      originalRequest._retry = true;
+      axios({
+        url: "/api/refresh",
+        method: "POST",
+        withCredentials: true,
+      }).then((data) => {
+        if (data.data) {
+          localStorage.setItem("accessToken", data.data.jwt_token);
+          axios.defaults.headers.common["Authorization"] =
+            "Bearer " + data.jwt_token;
+          originalRequest.headers["Authorization"] =
+            "Bearer " + data.data.jwt_token;
+          return axios(originalRequest);
+        }
+      });
+    } else {
+      return err.config;
+    }
+  }
+);
 function loginRequest() {
   return {
     type: LOGIN_REQUEST,
-  };
-}
-function loginError(err) {
-  return (dispatch) => {
-    axios({
-      withCredentials: true,
-      method: "POST",
-
-      url: "/api/logout",
-    });
-    dispatch({ type: LOGIN_ERROR, err });
   };
 }
 function loginSuccess(username, id) {
@@ -57,19 +77,11 @@ export function logOut() {
     }).then((res) => {
       if (res.status === 200) {
         localStorage.removeItem("accessToken");
-        localStorage.removeItem("state");
-        return "success";
       }
     });
   };
 }
-function currentUser(user) {
-  return {
-    type: CURRENT_USER,
-    user,
-  };
-}
-function unauthorized(err) {
+function unauthorized() {
   return {
     type: UNAUTHORIZED_ERROR,
   };
@@ -77,7 +89,6 @@ function unauthorized(err) {
 export function login(username, password) {
   return (dispatch) => {
     dispatch(loginRequest());
-
     return axios({
       withCredentials: true,
       method: "POST",
@@ -85,7 +96,6 @@ export function login(username, password) {
         username: username,
         password: password,
       },
-
       url: "/api/login",
     })
       .then((res) => {
@@ -110,46 +120,26 @@ export function clearLoginModal() {
   };
 }
 export function loggedIn() {
-  return (dispatch, getState) => {
-    const token = localStorage.getItem("accessToken");
-
+  const token = localStorage.getItem("accessToken");
+  return async (dispatch) => {
     if (!token) {
       return;
     }
-    return axios({
+    dispatch({ type: REQUEST_USER_INFO });
+    const data = await axios({
       withCredentials: true,
       method: "GET",
       url: "/api/logged-in",
-    })
-      .then((res) => {
-        if (res.status === 200) {
-          dispatch(
-            currentUser({
-              username: res.data.username,
-              _id: res.data._id,
-            })
-          );
-        }
-
-        if (res.data.error === "jwt expired") {
-          axios({
-            url: "/api/refresh",
-            withCredentials: true,
-            method: "POST",
-          }).then((res) => {
-            if (res.status === 200) {
-              let token = res.data.jwt_token;
-              dispatch({ type: REFRESH_USER, userInfo: res.data });
-              localStorage.setItem("accessToken", token);
-            }
-          });
-        }
-      })
-      .catch((err) => {
-        if (err) {
-          dispatch(loginError());
-        }
+    });
+    try {
+      dispatch({
+        type: CURRENT_USER,
+        username: data.data.username,
+        user: data.data._id,
       });
+    } catch (error) {
+      dispatch(logOut());
+    }
   };
 }
 export function signupRequest() {
@@ -165,7 +155,6 @@ function signupSuccess() {
 export function signup(username, password, passwordConfirm) {
   return (dispatch) => {
     dispatch({ type: SIGNUP_REQUEST });
-
     return axios({
       url: "/api/signup",
       data: {

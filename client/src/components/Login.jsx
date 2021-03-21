@@ -11,14 +11,15 @@ const Login = (props) => {
   const error = useSelector((state) => {
     return state.login.err;
   });
-  const handleLogin = () => {
-    dispatch(login(username, password)).then((x) => {
-      if (x === "login") {
-        window.location.reload();
-      }
-    });
+  const handleLogin = (e) => {
+    if (e.key === "Enter" || e.type === "click") {
+      dispatch(login(username, password)).then((x) => {
+        if (x === "login") {
+          window.location.reload();
+        }
+      });
+    }
   };
-
   if (user) {
   }
   return (
@@ -40,6 +41,7 @@ const Login = (props) => {
             type="text"
           />
           <input
+            onKeyDown={handleLogin}
             onChange={(e) => {
               setPassword(e.target.value);
             }}
@@ -56,5 +58,4 @@ const Login = (props) => {
     </div>
   );
 };
-
 export default Login;

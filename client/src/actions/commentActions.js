@@ -1,23 +1,25 @@
+import axios from "axios";
 import {
-  NEW_COMMENT_SUCCESS,
   NEW_COMMENT_REQUEST,
-  NEW_REPLY_SUCCESS,
+  NEW_COMMENT_SUCCESS,
   NEW_REPLY_REQUEST,
+  NEW_REPLY_SUCCESS,
   VOTE_CAST,
 } from "../types";
-import axios from "axios";
+
 export function newCommentRequest() {
   return {
     type: NEW_COMMENT_REQUEST,
   };
 }
-
-function newCommentSuccess(savedComment) {
+function newCommentSuccess(savedComment, postId, parentId) {
   return (dispatch, getState) => {
-    console.log(savedComment, "<-----");
-    let id = savedComment._id;
-    let postId = savedComment.postId;
-    dispatch({ type: NEW_COMMENT_SUCCESS, savedComment, id, postId });
+    dispatch({
+      type: NEW_COMMENT_SUCCESS,
+      savedComment,
+      postId,
+      parentId,
+    });
   };
 }
 export function newComment(content, postId) {
@@ -27,14 +29,12 @@ export function newComment(content, postId) {
       url: "/api/comment/new",
       method: "POST",
       data: {
-        content: content,
-        postId: postId,
+        content,
+        postId,
       },
       withCredentials: true,
     }).then((res) => {
-      let submittedComment = res.data;
-
-      dispatch(newCommentSuccess(submittedComment));
+      dispatch(newCommentSuccess(res.data, postId));
     });
   };
 }
@@ -49,31 +49,34 @@ export function test(test) {
     dispatch(test.push("sdfsdf"));
   };
 }
-
 export function changeCommentPoint(point, postId, commentId) {
   return (dispatch, getState) => {
-    let currentCommentId = commentId;
-    let currentComment = getState().comments.byId[currentCommentId];
-    let currentVoteState = currentComment.voteState;
-    dispatch({ type: VOTE_CAST, point, commentId, currentVoteState });
+    const currentCommentId = commentId;
+    const currentComment = getState().comments.byId[currentCommentId];
+    const currentVoteState = currentComment.voteState;
+    dispatch({
+      type: VOTE_CAST,
+      point,
+      commentId,
+      currentVoteState,
+    });
     if (point === 1) {
       axios({
-        url: `/api/comment/vote-up`,
+        url: "/api/comment/vote-up",
         method: "PUT",
         data: {
-          postId: postId,
-          commentId: commentId,
+          postId,
+          commentId,
         },
         withCredentials: true,
       });
-    }
-    if (point === -1) {
+    } else if (point === -1) {
       axios({
-        url: `/api/comment/vote-down`,
+        url: "/api/comment/vote-down",
         method: "PUT",
         data: {
-          postId: postId,
-          commentId: commentId,
+          postId,
+          commentId,
         },
         withCredentials: true,
       });
@@ -81,17 +84,21 @@ export function changeCommentPoint(point, postId, commentId) {
   };
 }
 export function newReply(content, postId, commentId) {
-  return (dispatch, getState) => {
-    return axios({
+  return (dispatch, getState) =>
+    axios({
       url: `/api/comments/${commentId}/replies`,
       method: "POST",
       data: {
-        content: content,
-        postId: postId,
+        content,
+        postId,
       },
       withCredentials: true,
     }).then((res) => {
-      dispatch(newCommentSuccess(res.data));
+      dispatch({
+        type: NEW_REPLY_SUCCESS,
+        reply: res.data,
+        postId,
+        commentId,
+      });
     });
-  };
 }

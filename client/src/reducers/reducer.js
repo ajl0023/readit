@@ -1,6 +1,7 @@
 import { combineReducers } from "redux";
 import {
   CLEAR_ERROR,
+  CLEAR_LOGIN_MODAL,
   CURRENT_USER,
   DELETE_POST,
   EDIT_POST,
@@ -20,33 +21,32 @@ import {
   RECEIVE_SINGLE_POSTS,
   REFRESH_USER,
   REQUEST_POSTS,
-  SET_POST,
+  REQUEST_USER_INFO,
   SET_POST_MODAL,
   SIGNUP_ERROR,
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,
-  CLEAR_LOGIN_MODAL,
   SORT_POSTS,
   SPLICED_POST,
   UNAUTHORIZED_ERROR,
   VOTE_CAST,
 } from "../types";
+function combineArrays(arr1, arr2) {
+  let combined = arr1.concat(arr2);
+  let set = new Set(combined);
+  return [...set];
+}
 function addComment(state, action) {
-  const { id, savedComment, postId } = action;
-  const comment = { ...savedComment };
-  if (comment.parentId) {
-    return {
-      ...state,
-    };
-  }
-  const post = state.byId[postId];
   return {
     ...state,
     byId: {
       ...state.byId,
-      [postId]: {
-        ...post,
-        comments: [id, ...state.byId[postId].comments],
+      [action.postId]: {
+        ...state.byId[action.postId],
+        comments: [
+          ...state.byId[action.postId].comments,
+          action.savedComment._id,
+        ],
       },
     },
   };
@@ -55,7 +55,6 @@ function changePostPoint(state, action) {
   const { postId } = action;
   const { point } = action;
   const { currentVoteState } = action;
-
   const post = state.byId[postId];
   if (action.commentId) {
     return state;
@@ -140,7 +139,6 @@ function changePostPoint(state, action) {
     }
   }
 }
-
 function handlePostSubmission(state, action) {
   const { post, id } = action;
   return {
@@ -155,12 +153,10 @@ function handlePostSubmission(state, action) {
       ...state.createdPosts,
       [id]: post,
     },
-
     submitted: true,
     reRouteId: id,
   };
 }
-
 function editPostReduce(state, action) {
   const { postId, content } = action;
   const post = state.byId[postId];
@@ -176,272 +172,82 @@ function editPostReduce(state, action) {
   };
 }
 function handlePreviousPage(state, action) {
-  let newPosts = action.newPosts;
-  let currentPosts = action.currentPosts;
-  let idsOfNewPosts = action.idsofNewData;
-  let idsOfCurrentPosts = Object.keys(action.currentPosts);
-  let newPostsArray = action.newPostsArray;
-  let currentPostsArray = action.arrayOfCurrentPosts;
-  let temp = {};
-  let temp2 = [];
-
-  for (let i = 0; i < newPostsArray.length; i++) {
-    if (idsOfCurrentPosts.includes(idsOfNewPosts[i])) {
-      currentPosts[idsOfNewPosts[i]] = newPostsArray[i];
-    } else {
-      temp2.push(newPostsArray[i]);
-    }
-  }
-  currentPostsArray = idsOfCurrentPosts.map((id) => {
-    return currentPosts[id];
-  });
-
-  currentPostsArray = currentPostsArray.concat(temp2);
-
-  for (let i = 0; i < currentPostsArray.length; i++) {
-    temp[currentPostsArray[i]._id] = currentPostsArray[i];
-  }
-
-  const finalArrayOfIds = currentPostsArray.map((a) => {
-    return a._id;
-  });
+  let allIds = state.allIds;
+  let incomingIds = action.normalizedData.result;
+  let set = new Set(incomingIds.concat(allIds));
   return {
     ...state,
     isFetching: false,
     byId: {
-      ...temp,
+      ...state.byId,
+      ...action.normalizedData.entities.posts,
     },
-    allIds: [...finalArrayOfIds],
     status: "succeeded",
-    firstId: newPostsArray[0]._id,
-    lastId: newPostsArray[newPostsArray.length - 1]._id,
+    allIds: [...set],
   };
 }
 function handleNextPage(state, action) {
-  let newPosts = action.newPosts;
-  let currentPosts = action.currentPosts;
-  let idsOfNewPosts = action.idsofNewData;
-  let idsofCurrentPosts = Object.keys(action.currentPosts);
-  let newPostsArray = action.newPostsArray;
-  let currentPostsArray = action.arrayOfCurrentPosts;
-  let temp = {};
-  let temp2 = [];
-  let temp3 = [];
-  for (let i = 0; i < newPostsArray.length; i++) {
-    if (idsofCurrentPosts.includes(idsOfNewPosts[i])) {
-      currentPosts[idsOfNewPosts[i]] = newPostsArray[i];
-    } else {
-      temp2.push(newPostsArray[i]);
-    }
-  }
-  currentPostsArray = idsofCurrentPosts.map((id) => {
-    return currentPosts[id];
-  });
-  currentPostsArray = currentPostsArray.concat(temp2);
-
-  for (let i = 0; i < currentPostsArray.length; i++) {
-    temp[currentPostsArray[i]._id] = currentPostsArray[i];
-  }
-
-  const finalArrayOfIds = currentPostsArray.map((a) => {
-    return a._id;
-  });
+  let allIds = state.allIds;
+  let incomingIds = action.normalizedData.result;
+  let set = new Set(allIds.concat(incomingIds));
   return {
     ...state,
     isFetching: false,
     byId: {
-      ...temp,
+      ...state.byId,
+      ...action.normalizedData.entities.posts,
     },
-    allIds: [...finalArrayOfIds],
+    offset: action.offset,
     status: "succeeded",
-    firstId: newPostsArray[0]._id,
-    lastId: newPostsArray[newPostsArray.length - 1]._id,
+    allIds: [...set],
   };
 }
-
-function handleSort(state, action) {
-  let newPosts = action.newPosts;
-  let currentPosts = action.currentPosts;
-  let idsOfNewPosts = action.idsofNewData;
-  let idsofCurrentPosts = Object.keys(action.currentPosts);
-  let newPostsArray = action.newPostsArray;
-  let currentPostsArray = action.arrayOfCurrentPosts;
-  let temp = {};
-  let temp2 = [];
-  let temp3 = [];
-  for (let i = 0; i < newPostsArray.length; i++) {
-    if (idsofCurrentPosts.includes(idsOfNewPosts[i])) {
-      currentPosts[idsOfNewPosts[i]] = newPostsArray[i];
-    } else {
-      temp2.push(newPostsArray[i]);
-    }
-  }
-  currentPostsArray = idsofCurrentPosts.map((id) => {
-    return currentPosts[id];
-  });
-  currentPostsArray = currentPostsArray.concat(temp2);
-
-  for (let i = 0; i < currentPostsArray.length; i++) {
-    temp[currentPostsArray[i]._id] = currentPostsArray[i];
-  }
-
-  const finalArrayOfIds = currentPostsArray.map((a) => {
-    return a._id;
-  });
+function setListings(state, action, prev) {
   return {
     ...state,
-    isFetching: false,
-    byId: {
-      ...temp,
+    status: "completed",
+    sortOrder: action.sort,
+    listingOrder: {
+      ...state.listingOrder,
+      [action.sort]: combineArrays(
+        state.listingOrder[action.sort] ? state.listingOrder[action.sort] : [],
+        action.normalizedData.result
+      ),
     },
-    allIds: [...finalArrayOfIds],
-    status: "succeeded",
-    firstId: newPostsArray[0]._id,
-    lastId: newPostsArray[newPostsArray.length - 1]._id,
   };
-}
-function setListings(state, action) {
-  if (action.sort) {
-    return {
-      ...state,
-      sortOrder: action.sort,
-      listingOrder: {
-        ...state.listingOrder,
-
-        [action.sort]: action.data.result,
-      },
-    };
-  }
-  if (!action.sort) {
-    return {
-      ...state,
-      sortOrder: "default",
-      listingOrder: {
-        ...state.listingOrder,
-
-        ["default"]: action.data.result,
-      },
-    };
-  }
-}
-function nextPageListing(state, action) {
-  let newPosts = action.newPosts;
-  let currentPosts = action.currentPosts;
-  let idsOfNewPosts = action.idsofNewData;
-  let idsofNewData = Object.keys(action.currentPosts);
-  let newPostsArray = action.newPostsArray;
-  let currentPostsArray = action.arrayOfCurrentPosts;
-  let temp = {};
-  let currentPostsSorted = state.listingOrder[action.sort]
-    ? [...state.listingOrder[action.sort]]
-    : null;
-  let currentPostsDefault = state.listingOrder.default
-    ? [...state.listingOrder.default]
-    : null;
-
-  if (action.sort) {
-    for (let i = 0; i < idsOfNewPosts.length; i++) {
-      if (state.listingOrder[action.sort].includes(idsOfNewPosts[i])) {
-        currentPosts[idsOfNewPosts[i]] = newPosts[idsOfNewPosts[i]];
-      } else {
-        currentPostsSorted.push(idsOfNewPosts[i]);
-      }
-    }
-    return {
-      ...state,
-      listingOrder: {
-        ...state.listingOrder,
-        [action.sort]: [...currentPostsSorted],
-      },
-    };
-  }
-  if (!action.sort) {
-    for (let i = 0; i < idsOfNewPosts.length; i++) {
-      if (state.listingOrder.default.includes(idsOfNewPosts[i])) {
-        currentPosts[idsOfNewPosts[i]] = newPosts[idsOfNewPosts[i]];
-      } else {
-        currentPostsDefault.push(idsOfNewPosts[i]);
-      }
-    }
-    return {
-      ...state,
-      listingOrder: {
-        ...state.listingOrder,
-        ["default"]: [...currentPostsDefault],
-      },
-    };
-  }
-}
-
-function prevPageListing(state, action) {
-  let newPosts = action.newPosts;
-  let currentPosts = action.currentPosts;
-  let idsOfNewPosts = action.idsofNewData;
-  let idsofNewData = Object.keys(action.currentPosts);
-  let newPostsArray = action.newPostsArray;
-  let currentPostsArray = action.arrayOfCurrentPosts;
-  let temp = [];
-  let currentPostsSorted = state.listingOrder[action.sort]
-    ? [...state.listingOrder[action.sort]]
-    : null;
-  let currentPostsDefault = state.listingOrder.default
-    ? [...state.listingOrder.default]
-    : null;
-
-  if (action.sort) {
-    for (let i = 0; i < idsOfNewPosts.length; i++) {
-      if (state.listingOrder[action.sort].includes(idsOfNewPosts[i])) {
-        currentPosts[idsOfNewPosts[i]] = newPosts[idsOfNewPosts[i]];
-      } else {
-        temp.push(idsOfNewPosts[i]);
-      }
-    }
-    currentPostsSorted = temp.concat(currentPostsSorted);
-    return {
-      ...state,
-      listingOrder: {
-        ...state.listingOrder,
-        [action.sort]: [...currentPostsSorted],
-      },
-    };
-  }
-  if (!action.sort) {
-    for (let i = 0; i < idsOfNewPosts.length; i++) {
-      if (state.listingOrder.default.includes(idsOfNewPosts[i])) {
-        currentPosts[idsOfNewPosts[i]] = newPosts[idsOfNewPosts[i]];
-      } else {
-        currentPostsDefault.push(idsOfNewPosts[i]);
-      }
-    }
-    return {
-      ...state,
-      listingOrder: {
-        ...state.listingOrder,
-        ["default"]: [...currentPostsDefault],
-      },
-    };
-  }
 }
 function listings(
   state = {
-    sortOrder: "",
+    sortOrder: "default",
     listingOrder: {},
+    status: "idle",
   },
   action
 ) {
   switch (action.type) {
     case SORT_POSTS:
-      return Object.assign({}, state, {
-        sortOrder: action.sortType,
+      return setListings(state, action);
+    case REQUEST_POSTS:
+      return action.e
+        ? Object.assign({}, state, {
+            status: "loading",
+          })
+        : state;
+    case DELETE_POST:
+      const filteredPosts = state.listingOrder[state.sortOrder].filter((id) => {
+        return id !== action.postId;
+      });
+      return {
+        ...state,
         listingOrder: {
           ...state.listingOrder,
-          [action.sortType]: action.idsofNewData,
+          [state.sortOrder]: [...filteredPosts],
         },
-      });
+      };
     case PREV_PAGE:
-      return prevPageListing(state, action);
+      return setListings(state, action, "prev");
     case NEXT_PAGE:
-      return nextPageListing(state, action);
+      return setListings(state, action);
     case RECEIVE_POSTS:
       return setListings(state, action);
     default:
@@ -449,21 +255,27 @@ function listings(
   }
 }
 function receievePosts(state, action) {
-  let index = action.arrayOfNewIds.indexOf(state.allIds);
-  let temp = action.arrayOfNewIds;
-  if (action.arrayOfNewIds.includes(action.data.result)) {
-    temp.splice(index, 1);
-
-    return temp;
-  } else {
-    return action.data.result;
-  }
+  let allIds = state.allIds;
+  let incomingIds = action.normalizedData.result;
+  let set = new Set(allIds.concat(incomingIds));
+  return {
+    ...state,
+    isFetching: false,
+    byId: {
+      ...state.byId,
+      ...action.normalizedData.entities.posts,
+    },
+    offset: action.offset,
+    status: "completed",
+    allIds: [...set],
+  };
 }
 function posts(
   state = {
     isFetching: false,
     byId: {},
     allIds: [],
+    offset: null,
     submitted: false,
     err: null,
     createdPosts: {},
@@ -477,7 +289,10 @@ function posts(
 ) {
   switch (action.type) {
     case SORT_POSTS:
-      return handleSort(state, action);
+      return Object.assign({}, state, {
+        status: "idle",
+        offset: action.offset,
+      });
     case PREV_PAGE:
       return handlePreviousPage(state, action);
     case NEXT_PAGE:
@@ -494,28 +309,19 @@ function posts(
         createdPosts: {},
       });
     case RECEIVE_SINGLE_POSTS:
-      return Object.assign({}, state, {
-        byId: { ...state.byId, ...action.temp },
-        allIds: [...state.allIds, action.id],
-      });
+      return receievePosts(state, action);
     case RECEIVE_POSTS:
-      return {
-        ...state,
-        isFetching: false,
-        status: "succeeded",
-        byId: {
-          ...state.byId,
-          ...action.data.entities.posts,
-          ...state.createdPosts,
-        },
-        allIds: receievePosts(state, action),
-        firstId: action.data.result[0],
-        lastId: action.data.result[action.data.result.length - 1],
-      };
+      return receievePosts(state, action);
     case VOTE_CAST:
       return changePostPoint(state, action);
     case DELETE_POST:
-      return Object.assign({}, state, {});
+      const allIds = state.allIds;
+      const filteredPosts = allIds.filter((id) => {
+        return id !== action.postId;
+      });
+      return Object.assign({}, state, {
+        allIds: filteredPosts,
+      });
     case NEW_COMMENT_SUCCESS:
       return addComment(state, action);
     case NEW_POST_REQUEST:
@@ -534,7 +340,6 @@ function posts(
 }
 function setPostModal(state, action) {
   const { post } = action;
-
   return {
     ...state,
     post,
@@ -557,47 +362,18 @@ function currentModal(
       return state;
   }
 }
-function commentIds(state, action) {
-  let comments = action.data.entities.comments;
-  let temp = [];
-  if (!comments) {
-    return [];
-  }
-  return Object.keys(comments);
-}
 function addCommentEntry(state, action) {
-  const { id, savedComment } = action;
-
-  const comment = { ...savedComment };
-
-  if (comment.parentId) {
-    const { parentId } = savedComment;
-    const newId = state.byId[parentId];
-
-    return {
-      ...state,
-      byId: {
-        [id]: comment,
-        ...state.byId,
-
-        [parentId]: {
-          ...state.byId[parentId],
-          comments: [id, ...state.byId[parentId].comments],
-        },
+  const { savedComment } = action;
+  return {
+    ...state,
+    byId: {
+      ...state.byId,
+      [action.savedComment._id]: {
+        ...state.byId[savedComment._id],
+        ...action.savedComment,
       },
-
-      allId: [id, ...state.allId],
-    };
-  } else {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [id]: comment,
-      },
-      allId: [id, ...state.allId],
-    };
-  }
+    },
+  };
 }
 function changeCommentPoint(state, action) {
   if (action.commentId) {
@@ -687,7 +463,19 @@ function changeCommentPoint(state, action) {
     return state;
   }
 }
-function onRecievePosts(state = {}, action) {}
+const newReply = (state, action) => {
+  return {
+    ...state,
+    byId: {
+      ...state.byId,
+      [action.commentId]: {
+        ...state.byId[action.commentId],
+        comments: [...state.byId[action.commentId].comments, action.reply._id],
+      },
+      [action.reply._id]: action.reply,
+    },
+  };
+};
 function comments(
   state = {
     byId: {},
@@ -696,18 +484,24 @@ function comments(
   action
 ) {
   switch (action.type) {
-    case RECEIVE_POSTS: {
+    case RECEIVE_SINGLE_POSTS: {
       return Object.assign({}, state, {
-        byId: action.data.entities.comments,
-        allId: commentIds(state, action),
+        byId: {
+          ...state.byId,
+          ...action.normalizedData.entities.comments,
+        },
       });
     }
-
-    case NEW_REPLY_SUCCESS:
+    case RECEIVE_POSTS: {
       return Object.assign({}, state, {
-        byId: { ...state.byId, ...action.temp },
-        allId: [...state.allId, action.newid],
+        byId: {
+          ...state.byId,
+          ...action.normalizedData.entities.comments,
+        },
       });
+    }
+    case NEW_REPLY_SUCCESS:
+      return newReply(state, action);
     case VOTE_CAST:
       return changeCommentPoint(state, action);
     case NEW_COMMENT_SUCCESS:
@@ -718,7 +512,6 @@ function comments(
       return state;
   }
 }
-
 function changeNewSubmissionType(
   state = {
     submissionType: "",
@@ -734,37 +527,10 @@ function changeNewSubmissionType(
       return state;
   }
 }
-function pageNumber(
-  state = {
-    currentPage: 0,
-    first_id: "",
-    last_id: "",
-  },
-  action
-) {
-  switch (action.type) {
-    case SET_POST:
-      return Object.assign({}, state, {
-        first_id: action.before,
-        last_id: action.after,
-      });
-    case NEXT_PAGE:
-      return Object.assign({}, state, {
-        currentPage: state.currentPage + 1,
-      });
-    case PREV_PAGE:
-      return Object.assign({}, state, {
-        currentPage: state.currentPage - 1,
-      });
-    default:
-      return state;
-  }
-}
 function signup(
   state = {
     isSigningUp: false,
     isSignedUp: false,
-
     err: null,
     passwordError: null,
   },
@@ -801,12 +567,15 @@ function login(
   state = {
     isLoggingIn: false,
     isLoggedIn: false,
-
     err: null,
   },
   action
 ) {
   switch (action.type) {
+    case REQUEST_USER_INFO:
+      return Object.assign({}, state, {
+        isLoggedIn: true,
+      });
     case UNAUTHORIZED_ERROR:
       return Object.assign({}, state, {
         err: "Username or Password do not match",
@@ -828,17 +597,12 @@ function login(
     case LOG_OUT:
       return Object.assign({}, state, {
         isLoggingIn: false,
-        isLoggingIn: false,
+        isLoggedIn: false,
       });
     case LOGIN_ERROR:
       return Object.assign({}, state, {
         isLoggingIn: false,
         isLoggedIn: false,
-      });
-    case CURRENT_USER:
-      return Object.assign({}, state, {
-        isLoggedIn: true,
-        currentUser: action.user,
       });
     default:
       return state;
@@ -848,7 +612,6 @@ function currentUser(
   state = {
     username: "",
     _id: "",
-
     err: null,
   },
   action
@@ -856,8 +619,8 @@ function currentUser(
   switch (action.type) {
     case LOG_OUT:
       return Object.assign({}, state, {
-        username: "",
-        _id: "",
+        username: null,
+        _id: null,
       });
     case REFRESH_USER:
       return Object.assign({}, state, {
@@ -872,8 +635,8 @@ function currentUser(
     case CURRENT_USER:
       return Object.assign({}, state, {
         isLoggedIn: true,
-        username: action.user.username,
-        _id: action.user._id,
+        username: action.username,
+        _id: action.user,
       });
     default:
       return state;
@@ -884,11 +647,9 @@ const rootReducer = combineReducers({
   currentModal,
   changeNewSubmissionType,
   posts,
-  pageNumber,
   login,
   signup,
   currentUser,
   listings,
 });
-
 export default rootReducer;

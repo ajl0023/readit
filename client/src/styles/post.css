@@ -82,7 +82,7 @@ textarea:focus {
 }
 
 .comment-container {
-  width: 100%;
+  height: auto;
 }
 
 .signup-error {
@@ -95,7 +95,6 @@ textarea:focus {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: 100%;
   gap: 10px;
 }
 
@@ -145,3 +144,75 @@ textarea:focus {
   -webkit-filter: invert(53%) sepia(85%) saturate(3616%) hue-rotate(4deg) brightness(97%) contrast(102%);
           filter: invert(53%) sepia(85%) saturate(3616%) hue-rotate(4deg) brightness(97%) contrast(102%);
 }
+
+@media only screen and (max-width: 629px) {
+  .close-label {
+    top: 0;
+    position: absolute;
+    right: 14px;
+    -webkit-transform: translateY(50%);
+            transform: translateY(50%);
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    cursor: pointer;
+    inline-size: 18px;
+    font-size: 14px;
+    z-index: 7;
+    line-height: 21px;
+    block-size: calc(20px + 10px);
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+  }
+  .close-label .main-close-icon-container {
+    position: relative;
+    display: block;
+    block-size: 18px;
+    inline-size: 100%;
+  }
+  .close-label .main-close-icon-container .main-close-icon {
+    background-color: transparent;
+    inline-size: 100%;
+    position: absolute;
+    display: block;
+    -webkit-transition: all 300ms ease-in-out;
+    transition: all 300ms ease-in-out;
+    block-size: calc(20px / 10);
+    top: calc(36% + 2px);
+  }
+  .close-label .main-close-icon-container .main-close-icon:before {
+    -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+    -webkit-transition: all 300ms ease-in-out;
+    transition: all 300ms ease-in-out;
+    block-size: calc(20px / 10);
+    background-color: black;
+    content: "";
+    top: 0;
+    display: block;
+    position: absolute;
+    inline-size: 100%;
+  }
+  .close-label .main-close-icon-container .main-close-icon:after {
+    -webkit-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+    -webkit-transition: all 300ms ease-in-out;
+    transition: all 300ms ease-in-out;
+    block-size: calc(20px / 10);
+    background-color: black;
+    content: "";
+    top: 0;
+    display: block;
+    position: absolute;
+    inline-size: 100%;
+  }
+  .burger-input {
+    opacity: 1;
+    display: none;
+  }
+  .auth-button-container-navbar {
+    display: none;
+  }
+}
+/*# sourceMappingURL=post.css.map */

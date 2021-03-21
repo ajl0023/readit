@@ -6,7 +6,6 @@ const UserSchema = new Schema({
   createdAt: { type: Date },
   profileImg: {
     type: String,
-    
   },
   updatedAt: { type: Date },
   sign: { type: String },

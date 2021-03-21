@@ -1,13 +1,12 @@
-import { normalize, schema } from "normalizr";
-
+import { schema } from "normalizr";
 export const comment = new schema.Entity(
   "comments",
   {},
   { idAttribute: "_id" }
 );
-
-export const comments = new schema.Array(comment);
-comment.define({ comments });
+comment.define({
+  comments: [comment],
+});
 export const post = new schema.Entity(
   "posts",
   {
