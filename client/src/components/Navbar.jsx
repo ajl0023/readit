@@ -50,8 +50,8 @@ function Navbar(props) {
     setSearchActive(!searchActive);
   };
   const handleLogout = () => {
-    dispatch(logOut()).then((test) => {
-      if (test === "success") {
+    dispatch(logOut()).then((data) => {
+      if (data.status === 200) {
         window.location.reload();
       }
     });

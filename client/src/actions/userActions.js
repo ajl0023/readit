@@ -69,7 +69,6 @@ function loginSuccess(username, id) {
 }
 export function logOut() {
   return (dispatch) => {
-    dispatch({ type: LOG_OUT });
     return axios({
       url: "/api/logout",
       withCredentials: true,
@@ -77,6 +76,7 @@ export function logOut() {
     }).then((res) => {
       if (res.status === 200) {
         localStorage.removeItem("accessToken");
+        return res;
       }
     });
   };
