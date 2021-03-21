@@ -48,7 +48,7 @@ axios.interceptors.response.use(
         }
       });
     } else {
-      return err.config;
+      return Promise.reject(err);
     }
   }
 );
@@ -124,7 +124,7 @@ export function loggedIn() {
   const token = localStorage.getItem("accessToken");
   return async (dispatch) => {
     if (!token) {
-      return 'completed';
+      return "completed";
     }
     dispatch({ type: REQUEST_USER_INFO });
     const data = await axios({
@@ -138,7 +138,7 @@ export function loggedIn() {
         username: data.data.username,
         user: data.data._id,
       });
-      return 'completed';
+      return "completed";
     } catch (error) {
       dispatch(logOut());
     }
