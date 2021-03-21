@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
 import { changePostSubmissionType, submitPost } from "../actions/postActions";
+import { loggedIn, loginStatus } from "../actions/userActions";
 
 const NewPost = () => {
   const useQuery = () => {
@@ -21,10 +22,15 @@ const NewPost = () => {
   const submitCheck = useSelector((state) => {
     return state.posts.submitted;
   });
+  const fetchingLogin = useSelector((state) => state.login.fetching);
+  const loggedInStatus = useSelector((state) => state.login.isLoggedIn);
+
   const reRouteId = useSelector((state) => {
     return state.posts.reRouteId;
   });
-
+  useEffect(() => {
+ 
+  }, []);
   useEffect(() => {
     if (newQuery) {
       submissionType = "media";
@@ -35,7 +41,9 @@ const NewPost = () => {
       history.push(`/post/${reRouteId}`);
     }
   }, [submitCheck]);
-
+  if (fetchingLogin) {
+    return <div></div>;
+  }
   const uploadForm = (e) => {
     e.preventDefault();
     const data = new FormData();

@@ -568,6 +568,7 @@ function login(
     isLoggingIn: false,
     isLoggedIn: false,
     err: null,
+    fetching: false,
   },
   action
 ) {
@@ -575,6 +576,11 @@ function login(
     case REQUEST_USER_INFO:
       return Object.assign({}, state, {
         isLoggedIn: true,
+        fetching: true,
+      });
+    case CURRENT_USER:
+      return Object.assign({}, state, {
+        fetching: false,
       });
     case UNAUTHORIZED_ERROR:
       return Object.assign({}, state, {

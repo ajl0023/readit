@@ -12,13 +12,18 @@ import Signup from "./components/Signup";
 import "./styles/myApp.scss";
 function App(props) {
   const [showLogin, setLogin] = useState(false);
+  const [fetchingLogin, setFetchingLogin] = useState(true);
   const [showSignup, setShowSignup] = useState(false);
-
-  const loggedInStatus = useSelector((state) => state.login.isLoggedIn);
+  const loggedInStatus = useSelector((state) => state.currentUser.isLoggedIn);
   const signedUpStatus = useSelector((state) => state.signup.isSignedUp);
   const dispatch = useDispatch();
+
   useEffect(() => {
-    dispatch(loggedIn());
+    dispatch(loggedIn()).then((data) => {
+      if (data) {
+        setFetchingLogin(false);
+      }
+    });
   }, [dispatch]);
   useEffect(() => {
     if (loggedInStatus) {
@@ -43,6 +48,7 @@ function App(props) {
   const handleShowNextPage = (lastId, sort) => {
     dispatch(nextPage(lastId, sort));
   };
+
   return (
     <div id="scroll-wrapper" className={"app-wrapper"}>
       {showLogin ? <Login close={closeModal} /> : null}
@@ -72,8 +78,9 @@ function App(props) {
             return <NewPost {...props} />;
           }}
         >
-          {!loggedInStatus ? <Redirect to="/" /> : null}
+          {!fetchingLogin && !props.loggedIn ? <Redirect to="/" /> : null}
         </Route>
+
         <Route
           path={["/:sort", "/"]}
           render={(props2) => {

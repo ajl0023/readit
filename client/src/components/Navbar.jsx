@@ -131,7 +131,7 @@ function Navbar(props) {
                   : null}
               </div>
             </div>
-            {!localStorage.getItem("accessToken") && !loggedIn ? (
+            {!loggedIn ? (
               <>
                 <div className="auth-button-container-navbar">
                   <button onClick={props.handleShowLogin}>log in</button>

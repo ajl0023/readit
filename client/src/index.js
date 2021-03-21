@@ -8,6 +8,7 @@ import App from "./App";
 import configureStore from "./store/store";
 const store = configureStore();
 const history = createBrowserHistory();
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>

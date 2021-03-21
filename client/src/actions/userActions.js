@@ -119,11 +119,12 @@ export function clearLoginModal() {
     type: CLEAR_LOGIN_MODAL,
   };
 }
+
 export function loggedIn() {
   const token = localStorage.getItem("accessToken");
   return async (dispatch) => {
     if (!token) {
-      return;
+      return 'completed';
     }
     dispatch({ type: REQUEST_USER_INFO });
     const data = await axios({
@@ -137,11 +138,13 @@ export function loggedIn() {
         username: data.data.username,
         user: data.data._id,
       });
+      return 'completed';
     } catch (error) {
       dispatch(logOut());
     }
   };
 }
+
 export function signupRequest() {
   return {
     type: SIGNUP_REQUEST,

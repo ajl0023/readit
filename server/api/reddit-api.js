@@ -291,7 +291,8 @@ module.exports = (app) => {
     postToObject.hotScore = hotScore;
     postToObject.voteTotal = score;
     postToObject.voteState = 1;
-    post.topScore = new Date(curr.createdAt).getTime() / Math.pow(10, 6);
+    postToObject.topScore =
+      new Date(postToObject.createdAt).getTime() / Math.pow(10, 6);
     res.status(200).json(postToObject);
     await newPost.save();
   });
@@ -473,16 +474,17 @@ module.exports = (app) => {
       }
     });
   });
-  app.post("/api/logout", (req, res) => {
+  app.post("/api/logout", (req, res, next) => {
     res.clearCookie("refresh");
-    res.status(200).json("user has been logged out");
+
+    res.status(200).json("logged out");
   });
   app.get("/api/logged-in", (req, res, next) => {
     const authHeader = req.headers.authorization;
     const bearerToken = authHeader.split(" ");
     const token = bearerToken[1];
     if (!req.cookies.refresh) {
-      res.status(403);
+      res.status(403).json("refresh token expired");
     } else {
       jwt.verify(token, process.env.ACCESS_TOKEN, (err, data) => {
         if (err) {
