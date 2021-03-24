@@ -857,7 +857,7 @@ html {
     }
   }
   .burger-input {
-    opacity: 1;
+    opacity: 100%;
     display: none;
     &:checked ~ .burger-label {
       z-index: 102;
