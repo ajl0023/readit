@@ -172,7 +172,7 @@ textarea:focus {
     inline-size: 100%;
   }
   .close-label .main-close-icon-container .main-close-icon {
-    background-color: transparent;
+    background-color: transparent !important;
     inline-size: 100%;
     position: absolute;
     display: block;

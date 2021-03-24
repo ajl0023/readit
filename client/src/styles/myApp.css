@@ -116,6 +116,18 @@ html {
   background-color: white !important;
 }
 
+.dark-mode-burger .main-close-icon {
+  background-color: white !important;
+}
+
+.dark-mode-burger .main-close-icon:before {
+  background-color: white !important;
+}
+
+.dark-mode-burger .main-close-icon:after {
+  background-color: white !important;
+}
+
 .outline-visible {
   stroke: white;
   fill: white !important;

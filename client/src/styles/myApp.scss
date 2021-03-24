@@ -97,6 +97,16 @@ html {
       background-color: white !important;
     }
   }
+  .main-close-icon {
+    background-color: white !important;
+
+    &:before {
+      background-color: white !important;
+    }
+    &:after {
+      background-color: white !important;
+    }
+  }
 }
 .outline-visible {
   stroke: white;

@@ -70,7 +70,12 @@ const PostModal = (props) => {
       className={`modal-wrapper ${checkDisplay === "dark" ? "dark-mode" : ""}`}
     >
       <input type="checkbox" id="trigger" className={"burger-input"} />
-      <label htmlFor="trigger" className={"close-label"}>
+      <label
+        htmlFor="trigger"
+        className={`close-label ${
+          checkDisplay === "dark" ? "dark-mode-burger" : ""
+        }`}
+      >
         <div onClick={handleReroute} className={"main-close-icon-container"}>
           <span className={"main-close-icon"}></span>
         </div>
