@@ -13,6 +13,9 @@ const Post = ({ post }) => {
   const postStore = useSelector((state) => {
     return state.posts.allIds;
   });
+  const checkDisplay = useSelector((state) => {
+    return state.display.display;
+  });
   const currentUser = useSelector((state) => state.currentUser._id);
   const postStatus = useSelector((state) => state.listings.status);
   const handleDelete = () => {
@@ -27,7 +30,12 @@ const Post = ({ post }) => {
   }
   return (
     <>
-      <div key={post._id} className="card-container">
+      <div
+        key={post._id}
+        className={`card-container ${
+          checkDisplay === "dark" ? "dark-mode-card" : ""
+        } `}
+      >
         <div
           className={`card-content-container ${
             postStatus === "loading" ? "content-loading-mask" : ""
@@ -52,14 +60,22 @@ const Post = ({ post }) => {
           <div className="vote-container">
             <li>
               <UpArrow
-                className={post.voteState === 1 ? `home-vote-color` : ``}
+                className={
+                  post.voteState === 1
+                    ? `home-vote-color`
+                    : `${checkDisplay === "dark" ? "dark-mode-arrow" : ""}`
+                }
                 alt=""
               />
             </li>
             <li>{post.voteTotal}</li>
             <li>
               <DownArrow
-                className={post.voteState === -1 ? `home-vote-color` : ``}
+                className={
+                  post.voteState === -1
+                    ? `home-vote-color`
+                    : `${checkDisplay === "dark" ? "dark-mode-arrow" : ""}`
+                }
                 alt=""
               />
             </li>

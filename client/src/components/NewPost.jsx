@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
 import { changePostSubmissionType, submitPost } from "../actions/postActions";
 import { loggedIn, loginStatus } from "../actions/userActions";
-
 const NewPost = () => {
   const useQuery = () => {
     return new URLSearchParams(useLocation().search);
@@ -24,13 +23,13 @@ const NewPost = () => {
   });
   const fetchingLogin = useSelector((state) => state.login.fetching);
   const loggedInStatus = useSelector((state) => state.login.isLoggedIn);
-
   const reRouteId = useSelector((state) => {
     return state.posts.reRouteId;
   });
-  useEffect(() => {
- 
-  }, []);
+  const checkDisplay = useSelector((state) => {
+    return state.display.display;
+  });
+  useEffect(() => {}, []);
   useEffect(() => {
     if (newQuery) {
       submissionType = "media";
@@ -50,13 +49,10 @@ const NewPost = () => {
     data.append("title", title);
     data.append("content", text);
     data.append("file", imagedata);
-
     dispatch(submitPost(data));
   };
-
   const handleFormType = () => {
     window.history.replaceState("page2", "Title", "/new-post");
-
     dispatch(changePostSubmissionType("post"));
   };
   const handleImageType = () => {
@@ -68,16 +64,28 @@ const NewPost = () => {
     window.history.replaceState("page2", "Title", "/new-post");
   };
   return (
-    <div className="newpost-wrapper">
+    <div
+      className={`newpost-wrapper ${
+        checkDisplay === "dark" ? "dark-mode" : ""
+      }`}
+    >
       <div className="newpost-container">
         <p className="newpost-title">Create a post</p>
-        <div className="newpost-template">
+        <div
+          className={`newpost-template ${
+            checkDisplay === "dark" ? "navbar-dropdown-options-dark" : ""
+          }`}
+        >
           <div className="newpost-options">
             <button
               className={
                 submissionType === "post"
-                  ? `submit-type-button ${`selectedType`}`
-                  : `submit-type-button`
+                  ? `submit-type-button ${`selectedType`} ${
+                      checkDisplay === "dark" ? "dark-mode-submit" : ""
+                    }`
+                  : `submit-type-button ${
+                      checkDisplay === "dark" ? "dark-mode-submit" : ""
+                    } `
               }
               onClick={handleFormType}
             >
@@ -86,8 +94,12 @@ const NewPost = () => {
             <button
               className={
                 submissionType === "media"
-                  ? `submit-type-button ${`selectedType`}`
-                  : `submit-type-button`
+                  ? `submit-type-button ${`selectedType`} ${
+                      checkDisplay === "dark" ? "dark-mode-submit" : ""
+                    }`
+                  : `submit-type-button ${
+                      checkDisplay === "dark" ? "dark-mode-submit" : ""
+                    } `
               }
               onClick={handleImageType}
             >
@@ -96,8 +108,12 @@ const NewPost = () => {
             <button
               className={
                 submissionType === "link"
-                  ? `submit-type-button ${`selectedType`}`
-                  : `submit-type-button`
+                  ? `submit-type-button ${`selectedType`} ${
+                      checkDisplay === "dark" ? "dark-mode-submit" : ""
+                    }`
+                  : `submit-type-button ${
+                      checkDisplay === "dark" ? "dark-mode-submit" : ""
+                    } `
               }
               onClick={handleLinkType}
             >
@@ -111,11 +127,12 @@ const NewPost = () => {
                   setTitle(e.target.value);
                 }}
                 placeholder="Title"
-                className="newpost-title"
+                className={`newpost-title ${
+                  checkDisplay === "dark" ? "dark-mode-input" : ""
+                }`}
                 type="text"
               />
             </div>
-
             <div className="newpost-entry-container">
               {submissionType === "media" ? (
                 <div className="upload-input-container">
@@ -135,7 +152,9 @@ const NewPost = () => {
                     setText(e.target.value);
                   }}
                   placeholder="Text(optional)"
-                  className="newpost-entry"
+                  className={`newpost-entry ${
+                    checkDisplay === "dark" ? "dark-mode-input" : ""
+                  }`}
                   name=""
                   id=""
                   cols="30"
@@ -146,7 +165,9 @@ const NewPost = () => {
                 <button
                   type="submit"
                   onClick={(e) => uploadForm(e)}
-                  className="submission-buttons"
+                  className={`submission-buttons ${
+                    checkDisplay === "dark" ? "dark-mode-button" : ""
+                  }`}
                 >
                   Post
                 </button>
@@ -158,5 +179,4 @@ const NewPost = () => {
     </div>
   );
 };
-
 export default NewPost;

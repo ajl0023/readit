@@ -3,6 +3,7 @@ import {
   CLEAR_ERROR,
   CLEAR_LOGIN_MODAL,
   CURRENT_USER,
+  DARK_MODE_ENABLED,
   DELETE_POST,
   EDIT_POST,
   LOGIN_ERROR,
@@ -30,6 +31,7 @@ import {
   SPLICED_POST,
   UNAUTHORIZED_ERROR,
   VOTE_CAST,
+  DARK_MODE_DISABLED,
 } from "../types";
 function combineArrays(arr1, arr2) {
   let combined = arr1.concat(arr2);
@@ -648,8 +650,28 @@ function currentUser(
       return state;
   }
 }
+export function display(
+  state = {
+    display: "default",
+  },
+  action
+) {
+  switch (action.type) {
+    case DARK_MODE_ENABLED:
+      return Object.assign({}, state, {
+        display: "dark",
+      });
+    case DARK_MODE_DISABLED:
+      return Object.assign({}, state, {
+        display: "default",
+      });
+    default:
+      return state;
+  }
+}
 const rootReducer = combineReducers({
   comments,
+  display,
   currentModal,
   changeNewSubmissionType,
   posts,

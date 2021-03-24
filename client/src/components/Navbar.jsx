@@ -3,10 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, withRouter } from "react-router-dom";
 import { fetchPosts } from "../actions/postActions";
 import { logOut } from "../actions/userActions";
-import hamburger from "../images/hamburger.svg";
 import searchicon from "../images/magnifying-glass.svg";
 import defaultPic from "../images/reddit-default.svg";
 import triangle from "../images/Triangle.svg";
+import { DARK_MODE_ENABLED, DARK_MODE_DISABLED } from "../types";
+import Brightness2OutlinedIcon from "@material-ui/icons/Brightness2Outlined";
 function Navbar(props) {
   const [dropdown, setDropDown] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -32,8 +33,16 @@ function Navbar(props) {
   let flattened = allIds.map((x) => {
     return post[x];
   });
+  const checkDisplay = useSelector((state) => {
+    return state.display.display;
+  });
   const handleDropDown = () => {
     setDropDown(!dropdown);
+  };
+  const handleDarkMode = () => {
+    dispatch({
+      type: checkDisplay === "dark" ? DARK_MODE_DISABLED : DARK_MODE_ENABLED,
+    });
   };
   let value;
   const handleSearchContent = async (e) => {
@@ -79,8 +88,12 @@ function Navbar(props) {
   }, [closeSearch]);
   return (
     <>
-      <div className="navbar-wrapper">
-        <div className="navbar-container">
+      <div className={`navbar-wrapper `}>
+        <div
+          className={`navbar-container ${
+            checkDisplay === "dark" ? "dark-mode-nav" : ""
+          } `}
+        >
           <div className="navbar-content">
             <li>
               <Link
@@ -96,7 +109,9 @@ function Navbar(props) {
               <input
                 onClick={handleCloseSearch}
                 onChange={(e) => handleSearchContent(e)}
-                className="search-bar"
+                className={`search-bar ${
+                  checkDisplay === "dark" ? "dark-mode-input" : ""
+                } `}
                 placeholder="Search"
                 type="text"
               />
@@ -105,7 +120,15 @@ function Navbar(props) {
               </span>
               <div
                 onClick={(e) => handleCloseSearch(e)}
-                className="search-dropdown-container"
+                className={`${
+                  searchActive
+                    ? `search-dropdown-container ${
+                        checkDisplay === "dark"
+                          ? "dark-mode-search-dropdown"
+                          : ""
+                      }`
+                    : "inactive"
+                }`}
               >
                 {re.test(searchInput)
                   ? searchContent.map((post) => {
@@ -119,7 +142,11 @@ function Navbar(props) {
                             key={post._id}
                           >
                             <Link
-                              className={`search-content-item`}
+                              className={`search-content-item ${
+                                checkDisplay === "dark"
+                                  ? "dark-mode-dropdown-item"
+                                  : ""
+                              }`}
                               to={`/post/${post._id}`}
                             >
                               {post.title}
@@ -133,8 +160,21 @@ function Navbar(props) {
             </div>
             {!loggedIn ? (
               <>
+                <Brightness2OutlinedIcon
+                  className={
+                    checkDisplay === "dark"
+                      ? "outline-visible"
+                      : "brightness-icon"
+                  }
+                  onClick={handleDarkMode}
+                />
                 <div className="auth-button-container-navbar">
-                  <button onClick={props.handleShowLogin}>log in</button>
+                  <button
+                    className={checkDisplay === "dark" ? "dark-mode" : ""}
+                    onClick={props.handleShowLogin}
+                  >
+                    log in
+                  </button>
                   <button onClick={props.handleShowSignup}>sign up</button>
                 </div>
                 <div className="hamburger-container">
@@ -144,14 +184,24 @@ function Navbar(props) {
                       id="trigger"
                       className={"burger-input"}
                     />
-                    <label htmlFor="trigger" className={"burger-label"}>
+                    <label
+                      htmlFor="trigger"
+                      className={`burger-label ${
+                        checkDisplay === "dark" ? "dark-mode-burger" : ""
+                      } `}
+                    >
                       <div className={"main-trigger-icon-container"}>
                         <span className={"main-trigger-icon"}></span>
                       </div>
                     </label>
                     <div className="hamburger-item-container">
-                      <li className="hamburger-item">
-                        {" "}
+                      <li
+                        className={`hamburger-item ${
+                          checkDisplay === "dark"
+                            ? "dark-mode-dropdown-item"
+                            : ""
+                        } `}
+                      >
                         <button
                           className="hamburger-item-button"
                           onClick={props.handleShowLogin}
@@ -159,7 +209,13 @@ function Navbar(props) {
                           log in
                         </button>
                       </li>
-                      <li className="hamburger-item">
+                      <li
+                        className={`hamburger-item ${
+                          checkDisplay === "dark"
+                            ? "dark-mode-dropdown-item"
+                            : ""
+                        } `}
+                      >
                         <button
                           className="hamburger-item-button"
                           onClick={props.handleShowSignup}
@@ -172,45 +228,65 @@ function Navbar(props) {
                 </div>
               </>
             ) : (
-              <div className="profile-wrapper">
-                <button
-                  onClick={() => handleDropDown()}
-                  className="navbar-profile-container"
-                >
-                  <div className="navbar-logo-text">
+              <>
+                <Brightness2OutlinedIcon
+                  className={
+                    checkDisplay === "dark"
+                      ? "outline-visible"
+                      : "brightness-icon"
+                  }
+                  onClick={handleDarkMode}
+                />
+                <div className="profile-wrapper">
+                  <button
+                    onClick={() => handleDropDown()}
+                    className={`navbar-profile-container ${
+                      checkDisplay === "dark" ? "dark-mode-border" : ""
+                    }`}
+                  >
+                    <div className="navbar-logo-text">
+                      <img
+                        className={`default-profile-image ${
+                          checkDisplay === "dark" ? "dark-mode-border" : ""
+                        }`}
+                        style={{ backgroundColor: "rgba(0, 0, 0, 0.1)" }}
+                        src={defaultPic}
+                        alt=""
+                      />
+                      <p
+                        className={`navbar-profile-username ${
+                          checkDisplay === "dark" ? "dark-mode-font" : ""
+                        }`}
+                      >
+                        {currentUser.username}
+                      </p>
+                    </div>
                     <img
-                      className="default-profile-image"
-                      style={{ backgroundColor: "rgba(0, 0, 0, 0.1)" }}
-                      src={defaultPic}
+                      className="navbar-profile-triangle"
+                      src={triangle}
                       alt=""
                     />
-                    <p className="navbar-profile-username">
-                      {currentUser.username}
-                    </p>
-                  </div>
-                  <img
-                    className="navbar-profile-triangle"
-                    src={triangle}
-                    alt=""
-                  />
-                </button>
-                {dropdown ? (
-                  <div className="navbar-dropdown-container">
-                    <ul className="navbar-dropdown">
-                      <li>
-                        <button
-                          onClick={handleLogout}
-                          className="navbar-dropdown-options"
-                        >
-                          Logout
-                        </button>
-                      </li>
-                      <li></li>
-                      <li></li>
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
+                  </button>
+                  {dropdown ? (
+                    <div className="navbar-dropdown-container">
+                      <ul className="navbar-dropdown">
+                        <li>
+                          <button
+                            onClick={handleLogout}
+                            className={`navbar-dropdown-options ${
+                              checkDisplay === "dark"
+                                ? "navbar-dropdown-options-dark"
+                                : ""
+                            }`}
+                          >
+                            Logout
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  ) : null}
+                </div>
+              </>
             )}
           </div>
         </div>

@@ -18,6 +18,90 @@
 html {
   overflow-x: hidden;
 }
+@mixin dark-mode {
+  background-color: black !important;
+}
+@mixin dark-mode-border {
+  background-color: black !important;
+  border: 0.4px gray solid !important;
+}
+.dark-mode-arrow {
+  fill: white;
+}
+.dark-mode {
+  @include dark-mode();
+  color: white;
+}
+.dark-mode-dropdown-item {
+  @include dark-mode();
+  color: white !important;
+  button {
+    color: white;
+    &:hover {
+      color: #f06c00;
+    }
+  }
+  border-bottom: 0.3px gray solid !important;
+}
+.dark-mode-input {
+  color: white !important;
+  opacity: 100% !important;
+  @include dark-mode-border;
+}
+.dark-mode-font {
+  color: white !important;
+}
+.dark-mode-card {
+  @include dark-mode-border;
+}
+.dark-mode-nav {
+  @include dark-mode();
+  border-bottom: 0.3px gray solid !important;
+}
+.dark-mode-search-dropdown {
+  @include dark-mode();
+  border-top: none;
+  border-left: 0.3px gray solid !important;
+  border-right: 0.3px gray solid !important;
+}
+.dark-mode-border {
+  @include dark-mode-border();
+}
+.dark-mode-button {
+  background-color: black !important;
+  &:hover {
+    color: #f06c00;
+  }
+}
+.navbar-dropdown-options-dark {
+  color: white;
+  border: 0.3px gray solid !important;
+  @include dark-mode();
+  &:hover {
+    color: #f06c00;
+  }
+}
+.dark-mode-submit {
+  @include dark-mode();
+  border-color: gray !important;
+  color: white;
+}
+.dark-mode-burger {
+  .main-trigger-icon {
+    background-color: white !important;
+
+    &:before {
+      background-color: white !important;
+    }
+    &:after {
+      background-color: white !important;
+    }
+  }
+}
+.outline-visible {
+  stroke: white;
+  fill: white !important;
+}
 .navbar-wrapper {
   justify-content: center;
   align-items: center;
@@ -27,6 +111,9 @@ html {
   z-index: 6;
   position: sticky;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.15);
+  .brightness-icon {
+    outline: white;
+  }
 }
 .app-wrapper {
   width: 100vw;
@@ -67,7 +154,7 @@ html {
     max-width: 1000px;
     align-items: center;
     padding: 4px 12px;
-    grid-template-columns: 0.5fr 2fr 0.5fr;
+    grid-template-columns: 0.5fr 2fr 0.2fr 0.5fr;
     .logo {
       left: 0;
       top: 25%;
@@ -539,6 +626,7 @@ html {
   justify-content: space-between;
   .default-profile-image {
     width: 24px;
+    background-color: rgba(0, 0, 0, 0.1);
     height: 24px;
     border-radius: 4px;
     margin-right: 4px;
@@ -695,6 +783,7 @@ html {
 .burger-input {
   display: none;
 }
+
 @media only screen and (max-width: 838px) {
   .navbar-profile-username {
     display: none;
@@ -774,7 +863,7 @@ html {
       z-index: 102;
       .main-trigger-icon {
         transition: all 300ms ease-in-out;
-        background-color: transparent;
+        background-color: transparent !important;
         &:before {
           top: 0;
           transform: rotate(45deg);

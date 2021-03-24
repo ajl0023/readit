@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 import { newComment } from "../actions/commentActions";
-import { changePoint, editPost } from "../actions/postActions";
+import { changePoint, editPost, fetchSinglePost } from "../actions/postActions";
 import downvote from "../images/down-arrow.svg";
 import { ReactComponent as Edit } from "../images/edit.svg";
 import upvote from "../images/up-arrow.svg";
 import Comment from "./Comment";
+import { ReactComponent as DownArrow } from "../images/down-arrow.svg";
+import { ReactComponent as UpArrow } from "../images/up-arrow.svg";
 const PostModal = (props) => {
   const params = useParams();
   const dispatch = useDispatch();
@@ -37,6 +39,9 @@ const PostModal = (props) => {
       props.handleShowLogin();
     }
   };
+  const checkDisplay = useSelector((state) => {
+    return state.display.display;
+  });
   const handleDownVote = () => {
     if (loggedIn) {
       dispatch(changePoint(-1, params.id));
@@ -60,22 +65,42 @@ const PostModal = (props) => {
   const date = new Date(currentPost.createdAt);
   const formatDate = new Intl.DateTimeFormat("en-US", {}).format(date);
   return (
-    <div onClick={handleReroute} className="modal-wrapper">
+    <div
+      onClick={handleReroute}
+      className={`modal-wrapper ${checkDisplay === "dark" ? "dark-mode" : ""}`}
+    >
       <input type="checkbox" id="trigger" className={"burger-input"} />
       <label htmlFor="trigger" className={"close-label"}>
         <div onClick={handleReroute} className={"main-close-icon-container"}>
           <span className={"main-close-icon"}></span>
         </div>
       </label>
-      <div onClick={back} className="card-modal">
+      <div
+        onClick={back}
+        className={`card-modal ${
+          checkDisplay === "dark" ? "dark-mode-border" : ""
+        }`}
+      >
         {currentPost.author ? (
           <>
             <p className="card-modal-author">
               {" "}
               u/{currentPost.author.username}
             </p>
-            <p>{formatDate}</p>
-            <h4 className="card-modal-title">{currentPost.title}</h4>
+            <p
+              className={`modal-date ${
+                checkDisplay === "dark" ? "dark-mode-font" : ""
+              }`}
+            >
+              {formatDate}
+            </p>
+            <h4
+              className={`card-modal-title ${
+                checkDisplay === "dark" ? "dark-mode-font" : ""
+              }`}
+            >
+              {currentPost.title}
+            </h4>
             {currentUser === currentPost.author._id ? (
               <div className="edit-container">
                 <p
@@ -138,42 +163,67 @@ const PostModal = (props) => {
                 </span>
               </div>
             ) : (
-              <div className="no-user-comment-container">
+              <div
+                className={`no-user-comment-container ${
+                  checkDisplay === "dark" ? "dark-mode-border" : ""
+                } `}
+              >
                 <p className="no-user-comment">
                   Log in or sign up to leave a comment
                 </p>
                 <div className="auth-button-container">
-                  <button onClick={props.handleShowLogin}>log in</button>
+                  <button
+                    className={checkDisplay === "dark" ? "dark-mode" : ""}
+                    onClick={props.handleShowLogin}
+                  >
+                    log in
+                  </button>
                   <button onClick={props.handleShowSignup}>sign up</button>
                 </div>
               </div>
             )}
             <div className="card-modal-vote-container">
               <li onClick={handleUpvote}>
-                <img
+                <UpArrow
                   className={
                     currentPost.voteState === 1
                       ? `vote-button-color`
-                      : `vote-button`
+                      : `${
+                          checkDisplay === "dark"
+                            ? "dark-mode-arrow"
+                            : "vote-button"
+                        }`
                   }
                   src={upvote}
                   alt=""
                 />
               </li>
-              <li>{currentPost.voteTotal}</li>
+              <li className={checkDisplay === "dark" ? "dark-mode-font" : ""}>
+                {currentPost.voteTotal}
+              </li>
               <li onClick={handleDownVote}>
-                <img
+                <DownArrow
                   className={
                     currentPost.voteState === -1
                       ? `vote-button-color`
-                      : `vote-button`
+                      : `${
+                          checkDisplay === "dark"
+                            ? "dark-mode-arrow"
+                            : "vote-button"
+                        }`
                   }
                   src={downvote}
                   alt=""
                 />
               </li>
             </div>
-            <h4 className="comment-section-header">Comments</h4>
+            <h4
+              className={`comment-section-header ${
+                checkDisplay === "dark" ? "dark-mode-font" : ""
+              } `}
+            >
+              Comments
+            </h4>
             {props.post.comments.length > 0 &&
               props.post.comments.map((comment) => {
                 return (

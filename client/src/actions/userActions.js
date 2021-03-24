@@ -119,7 +119,6 @@ export function clearLoginModal() {
     type: CLEAR_LOGIN_MODAL,
   };
 }
-
 export function loggedIn() {
   const token = localStorage.getItem("accessToken");
   return async (dispatch) => {
@@ -144,7 +143,6 @@ export function loggedIn() {
     }
   };
 }
-
 export function signupRequest() {
   return {
     type: SIGNUP_REQUEST,

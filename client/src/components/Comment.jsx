@@ -8,12 +8,16 @@ import {
 } from "../actions/commentActions";
 import downvote from "../images/down-arrow.svg";
 import upvote from "../images/up-arrow.svg";
+import { ReactComponent as DownArrow } from "../images/down-arrow.svg";
+import { ReactComponent as UpArrow } from "../images/up-arrow.svg";
 const Comment = ({ comment, handleShowLogin }) => {
+  const checkDisplay = useSelector((state) => {
+    return state.display.display;
+  });
   const allComments = useSelector((state) => {
     return state.comments.byId;
   });
   const loggedIn = useSelector((state) => state.login.isLoggedIn);
-
   const dispatch = useDispatch();
   const params = useParams();
   const [replyText, setReplyText] = useState("");
@@ -36,14 +40,12 @@ const Comment = ({ comment, handleShowLogin }) => {
     setReplyToggle(!replyToggle);
     dispatch(newReplyRequest());
   };
-
   const handleReply = () => {
     let commentId = comment._id;
     dispatch(newReply(replyText, params.id, commentId));
     setReplyToggle(false);
     setReplyText("");
   };
-
   useEffect(() => {}, []);
   if (!comment) {
     return <div></div>;
@@ -56,22 +58,32 @@ const Comment = ({ comment, handleShowLogin }) => {
       <div className="comment-vote-title-container">
         <div className="comment-vote-container">
           <div className="comment-vote-button-container">
-            <img
+            <UpArrow
               className={
                 comment.voteState === 1
                   ? "comment-vote-button-color"
-                  : "comment-vote-button"
+                  : `${
+                      checkDisplay === "dark"
+                        ? "dark-mode-arrow"
+                        : "comment-vote-button"
+                    }`
               }
               src={upvote}
               onClick={voteUp}
               alt=""
             />
-            <span>{comment.voteTotal}</span>
-            <img
+            <span className={checkDisplay === "dark" ? "dark-mode-font" : ""}>
+              {comment.voteTotal}
+            </span>
+            <DownArrow
               className={
                 comment.voteState === -1
-                  ? "comment-vote-button-color"
-                  : "comment-vote-button"
+                  ? `comment-vote-button-color`
+                  : `${
+                      checkDisplay === "dark"
+                        ? "dark-mode-arrow"
+                        : "comment-vote-button"
+                    }`
               }
               src={downvote}
               onClick={voteDown}
@@ -79,8 +91,20 @@ const Comment = ({ comment, handleShowLogin }) => {
           </div>
         </div>
         <div className="comment-container">
-          <p className="comment-author">{comment.authorName}</p>
-          <div className="parent-comment">{comment.content}</div>
+          <p
+            className={`comment-author ${
+              checkDisplay === "dark" ? "dark-mode-font" : ""
+            }`}
+          >
+            {comment.authorName}
+          </p>
+          <div
+            className={`parent-comment ${
+              checkDisplay === "dark" ? "dark-mode-font" : ""
+            }`}
+          >
+            {comment.content}
+          </div>
           <div className="reply-button-container">
             {loggedIn ? (
               <button onClick={handleReplyToggle} className="reply-button">
@@ -111,10 +135,8 @@ const Comment = ({ comment, handleShowLogin }) => {
           </div>
         </div>
       </div>
-
       <div className="nested-comments">{nestedComments}</div>
     </div>
   );
 };
-
 export default Comment;

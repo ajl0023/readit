@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import {
   fetchPosts,
+  fetchSinglePost,
   newPostSubmissionType,
   nextPage,
   submitPostAttempt,
@@ -17,6 +18,10 @@ function Home(props) {
   const allPosts = useSelector((state) => {
     return state.posts.byId;
   });
+  const checkDisplay = useSelector((state) => {
+    return state.display.display;
+  });
+  const location = useLocation();
   const loggedIn = useSelector((state) => state.login.isLoggedIn);
   const postStatus = useSelector((state) => state.posts.status);
   const params = useParams();
@@ -54,7 +59,7 @@ function Home(props) {
           });
         }
       }, options);
-      if (node) {
+      if (postsToDisplay.length > 0 && node && params.sort !== "post") {
         observer.observe(node);
       } else {
         observer.disconnect();
@@ -63,7 +68,13 @@ function Home(props) {
     [offSetId]
   );
   useEffect(() => {
-    dispatch(fetchPosts(query, id, params.sort === "post" ? null : params));
+    const splitUrl = location.pathname.split("/");
+    if (params.sort === "post") {
+      dispatch(fetchSinglePost(splitUrl[2]));
+      dispatch(fetchPosts(query, id, params.sort === "post" ? null : params));
+    } else {
+      dispatch(fetchPosts(query, id, params.sort === "post" ? null : params));
+    }
   }, []);
   let listing = listingOrder[sortOrder];
   const handlePostType = (type) => {
@@ -78,11 +89,23 @@ function Home(props) {
   }
   return (
     <>
-      <div className="home-wrapper">
+      <div
+        className={`home-wrapper ${checkDisplay === "dark" ? "dark-mode" : ""}`}
+      >
         {props.showSignup ? <Signup /> : null}
-        <div className="new-post-container">
+        <div
+          className={`new-post-container ${
+            checkDisplay === "dark" ? "dark-mode-border" : ""
+          }`}
+        >
           <Link to="">
-            <img className="new-post-profile-image" src={defaultPic} alt="" />
+            <img
+              className={`new-post-profile-image ${
+                checkDisplay === "dark" ? "dark-mode-border" : ""
+              }`}
+              src={defaultPic}
+              alt=""
+            />
           </Link>
           <Link
             onClick={() => handlePostType("post")}
@@ -91,7 +114,9 @@ function Home(props) {
           >
             <input
               placeholder="Create Post"
-              className="new-post-input"
+              className={`new-post-input ${
+                checkDisplay === "dark" ? "dark-mode-border" : ""
+              }`}
               type="text"
             />
           </Link>
@@ -108,9 +133,14 @@ function Home(props) {
             <img className="post-option" src={linkPost} alt="" />
           </Link>
         </div>
-        <div className="categories-container">
+        <div
+          className={`categories-container ${
+            checkDisplay === "dark" ? "dark-mode-border" : ""
+          }`}
+        >
           <Link
             to="/hot"
+            className={`${checkDisplay === "dark" ? "dark-mode-border" : ""}`}
             onClick={() =>
               dispatch(fetchPosts(query, id, { sort: "hot" }, "click"))
             }
@@ -118,6 +148,7 @@ function Home(props) {
             Hot
           </Link>
           <Link
+            className={`${checkDisplay === "dark" ? "dark-mode-border" : ""}`}
             to="/new"
             onClick={() =>
               dispatch(fetchPosts(query, id, { sort: "new" }, "click"))
@@ -126,6 +157,7 @@ function Home(props) {
             New
           </Link>
           <Link
+            className={`${checkDisplay === "dark" ? "dark-mode-border" : ""}`}
             to="/top"
             onClick={() =>
               dispatch(fetchPosts(query, id, { sort: "top" }, "click"))

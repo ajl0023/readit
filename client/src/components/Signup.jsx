@@ -8,6 +8,9 @@ const Signup = (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const checkDisplay = useSelector((state) => {
+    return state.display.display;
+  });
   const dispatch = useDispatch();
   const user = useSelector((state) => {
     return state.login.isLoggedIn;
@@ -36,10 +39,25 @@ const Signup = (props) => {
   }, [dispatch]);
   return (
     <div className="login-modal-wrapper">
-      <div className="login-card-modal">
+      <div
+        className={`login-card-modal ${
+          checkDisplay === "dark" ? "dark-mode-border" : ""
+        }`}
+      >
         <div className="login-modal-title-exit-container">
-          <p className="login-modal-title">Sign up</p>
-          <button onClick={props.close} className="login-cancel-button">
+          <p
+            className={`login-modal-title ${
+              checkDisplay === "dark" ? "dark-mode-font" : ""
+            }`}
+          >
+            Sign up
+          </p>
+          <button
+            onClick={props.close}
+            className={`login-cancel-button ${
+              checkDisplay === "dark" ? "dark-mode-font" : ""
+            }`}
+          >
             X
           </button>
         </div>
@@ -49,7 +67,9 @@ const Signup = (props) => {
               setUsername(e.target.value);
             }}
             onClick={handleError}
-            className="login-input"
+            className={`login-input ${
+              checkDisplay === "dark" ? "dark-mode-input" : ""
+            }`}
             placeholder="username"
             type="text"
           />
@@ -58,7 +78,9 @@ const Signup = (props) => {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
-            className="login-input"
+            className={`login-input ${
+              checkDisplay === "dark" ? "dark-mode-input" : ""
+            }`}
             placeholder="password"
             type="password"
           />
@@ -67,7 +89,9 @@ const Signup = (props) => {
             onChange={(e) => {
               setPasswordConfirm(e.target.value);
             }}
-            className="login-input"
+            className={`login-input ${
+              checkDisplay === "dark" ? "dark-mode-input" : ""
+            }`}
             placeholder="Confirm your password"
             type="password"
           />

@@ -25,7 +25,6 @@ function requestPosts(e) {
     e,
   };
 }
-
 function submitPostSuccess(post) {
   let id = post._id;
   post["newPost"] = true;

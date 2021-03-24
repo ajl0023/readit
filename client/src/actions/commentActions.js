@@ -6,7 +6,6 @@ import {
   NEW_REPLY_SUCCESS,
   VOTE_CAST,
 } from "../types";
-
 export function newCommentRequest() {
   return {
     type: NEW_COMMENT_REQUEST,

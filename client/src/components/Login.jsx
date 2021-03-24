@@ -5,6 +5,9 @@ const Login = (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
+  const checkDisplay = useSelector((state) => {
+    return state.display.display;
+  });
   const user = useSelector((state) => {
     return state.login.isLoggedIn;
   });
@@ -24,10 +27,25 @@ const Login = (props) => {
   }
   return (
     <div className="login-modal-wrapper">
-      <div className="login-card-modal">
+      <div
+        className={`login-card-modal ${
+          checkDisplay === "dark" ? "dark-mode-border" : ""
+        }`}
+      >
         <div className="login-modal-title-exit-container">
-          <p className="login-modal-title">Login</p>
-          <button onClick={props.close} className="login-cancel-button">
+          <p
+            className={`login-modal-title ${
+              checkDisplay === "dark" ? "dark-mode-font" : ""
+            }`}
+          >
+            Login
+          </p>
+          <button
+            onClick={props.close}
+            className={`login-cancel-button ${
+              checkDisplay === "dark" ? "dark-mode-font" : ""
+            }`}
+          >
             X
           </button>
         </div>
@@ -36,7 +54,9 @@ const Login = (props) => {
             onChange={(e) => {
               setUsername(e.target.value);
             }}
-            className="login-input"
+            className={`login-input ${
+              checkDisplay === "dark" ? "dark-mode-input" : ""
+            }`}
             placeholder="username"
             type="text"
           />
@@ -45,7 +65,9 @@ const Login = (props) => {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
-            className="login-input"
+            className={`login-input ${
+              checkDisplay === "dark" ? "dark-mode-input" : ""
+            }`}
             placeholder="password"
             type="password"
           />{" "}
